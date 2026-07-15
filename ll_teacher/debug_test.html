@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><title>Debug Test</title></head>
+<body>
+<h1>Debug: Data Load Test</h1>
+<div id="log"></div>
+<script>
+var log = document.getElementById('log');
+function plog(msg) { log.innerHTML += '<p>' + msg + '</p>'; console.log(msg); }
+
+plog('Starting fetch...');
+fetch('js/orders_data.json')
+  .then(function(r) {
+    plog('Response status: ' + r.status);
+    plog('Content-Type: ' + r.headers.get('content-type'));
+    return r.text();
+  })
+  .then(function(text) {
+    plog('Raw text length: ' + text.length);
+    plog('First 100 chars: ' + text.substring(0, 100));
+    try {
+      var data = JSON.parse(text);
+      plog('PARSED OK! Orders: ' + data.length);
+      plog('First order: ' + data[0].orderId + ' - ' + data[0].address);
+    } catch(e) {
+      plog('JSON PARSE ERROR: ' + e.message);
+      plog('Pos: ' + (e.message.match(/position (\d+)/)||[])[1]);
+    }
+  })
+  .catch(function(e) {
+    plog('FETCH ERROR: ' + e.message);
+  });
+</script>
+</body>
+</html>

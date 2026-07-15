@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta property="og:title" content="成都家教订单展示 - 尹檀家教">
+<meta property="og:description" content="成都地区优质家教订单，一键复制信息。">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="尹檀家教">
+<title>尹檀家教 - 成都家教订单展示</title>
+<link href="css/bootstrap.min.css" rel="stylesheet">
+<style>
+:root {
+    --primary: #e85d04; --primary-hover: #d45203;
+    --bg: #fff9f5; --card-shadow: 0 2px 16px rgba(232,93,4,0.08);
+    --border: #ffe0cc; --table-header: #fff5ee;
+    --table-border: #ffe0cc; --radius: 10px;
+}
+* { box-sizing: border-box; }
+body { padding: 16px; background: var(--bg); font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif; }
+.navbar-custom { background: linear-gradient(135deg, #e85d04 0%, #f48c06 100%); border-radius: var(--radius); padding: 12px 20px; margin-bottom: 16px; color: #fff; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; box-shadow: 0 4px 20px rgba(232,93,4,0.2); }
+.navbar-custom .brand { font-size: 1.3rem; font-weight: 700; }
+.sync-status { text-align: center; padding: 6px; border-radius: 6px; margin-bottom: 12px; font-size: 0.85rem; transition: opacity 0.4s; }
+.sync-loading { background: #fff3cd; color: #856404; }
+.sync-success { background: #d4edda; color: #155724; }
+.sync-error { background: #f8d7da; color: #721c24; }
+.stats-card { background: #fff; border-radius: var(--radius); padding: 12px 16px; margin-bottom: 12px; box-shadow: var(--card-shadow); border: 1px solid var(--border); display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.stats-total { font-weight: 700; color: var(--primary); font-size: 1.05rem; }
+.stats-row { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; flex: 1; }
+.stats-badge { display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px; border-radius: 20px; font-size: 0.8rem; cursor: pointer; border: 1px solid var(--border); background: #fff; transition: all 0.15s; white-space: nowrap; }
+.stats-badge:hover { background: var(--primary); color: #fff; border-color: var(--primary); }
+.stats-badge .count { font-weight: 700; }
+.stats-badge.active { background: var(--primary); color: #fff; }
+.toolbar-card { background: #fff; border-radius: var(--radius); padding: 10px 14px; margin-bottom: 12px; box-shadow: var(--card-shadow); border: 1px solid var(--border); display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.search-wrap { position: relative; flex: 1; min-width: 180px; }
+.search-input { width: 100%; padding: 7px 12px 7px 32px; border: 1px solid var(--border); border-radius: 20px; font-size: 0.88rem; outline: none; transition: border 0.2s; }
+.search-input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(232,93,4,0.1); }
+.search-icon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); font-size: 0.85rem; }
+.location-wrap { display: flex; align-items: center; gap: 6px; font-size: 0.85rem; }
+.location-wrap .loc-addr { max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.btn { padding: 6px 14px; border-radius: 20px; font-size: 0.82rem; transition: all 0.15s; border: 1px solid var(--border); background: #fff; cursor: pointer; white-space: nowrap; }
+.btn:hover { opacity: 0.85; }
+.btn-primary { background: var(--primary); color: #fff; border-color: var(--primary); }
+.btn-outline-primary { color: var(--primary); border-color: var(--primary); }
+.btn-outline-success { color: #28a745; border-color: #28a745; }
+.btn-outline-secondary { color: #6c757d; border-color: #6c757d; }
+.filter-bar { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 10px; }
+.filter-chip { padding: 4px 12px; border-radius: 16px; border: 1px solid var(--border); font-size: 0.78rem; cursor: pointer; background: #fff; transition: all 0.15s; white-space: nowrap; }
+.filter-chip:hover, .filter-chip.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+.main-card { background: #fff; border-radius: var(--radius); box-shadow: var(--card-shadow); border: 1px solid var(--border); overflow: hidden; }
+.table-responsive { overflow-x: auto; }
+.table { width: 100%; border-collapse: collapse; font-size: 0.84rem; margin: 0; }
+.table th { background: var(--table-header); padding: 10px 8px; font-weight: 600; text-align: left; border-bottom: 2px solid var(--table-border); cursor: pointer; white-space: nowrap; position: sticky; top: 0; z-index: 1; }
+.table th:hover { color: var(--primary); }
+.sort-indicator { color: var(--primary); margin-left: 4px; }
+.table td { padding: 8px; border-bottom: 1px solid var(--table-border); vertical-align: middle; }
+.table tr { cursor: pointer; transition: background 0.12s; }
+.table tr:hover { background: #fff5ee; }
+.table .badge-reclaimed { background: #ffc107; color: #333; padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; display: inline-block; }
+.table .badge-refind { background: #17a2b8; color: #fff; padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; display: inline-block; }
+.table .badge-modified { background: #fd7e14; color: #fff; padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; display: inline-block; }
+.table .text-truncate { display: block; max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.page-info { padding: 10px 16px; font-size: 0.82rem; color: #666; border-top: 1px solid var(--border); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 4px; }
+.pagination-wrap { display: flex; justify-content: center; gap: 4px; padding: 10px; flex-wrap: wrap; }
+.pagination-wrap .page-btn { padding: 5px 12px; border-radius: 6px; border: 1px solid var(--border); font-size: 0.82rem; cursor: pointer; background: #fff; min-width: 36px; text-align: center; }
+.pagination-wrap .page-btn:hover:not(:disabled) { background: var(--primary); color: #fff; border-color: var(--primary); }
+.pagination-wrap .page-btn.active { background: var(--primary); color: #fff; border-color: var(--primary); font-weight: 700; }
+.pagination-wrap .page-btn:disabled { opacity: 0.4; cursor: default; }
+.modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.45); z-index: 1000; align-items: center; justify-content: center; }
+.modal.show { display: flex; }
+.modal-content { background: #fff; border-radius: 12px; max-width: 580px; width: 95%; max-height: 85vh; overflow-y: auto; box-shadow: 0 8px 40px rgba(0,0,0,0.18); }
+.modal-header { padding: 16px 20px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
+.modal-header h5 { margin: 0; font-weight: 700; color: var(--primary); }
+.modal-close { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #999; padding: 0; line-height: 1; }
+.modal-close:hover { color: #333; }
+.modal-body { padding: 20px; }
+.modal-body .detail-row { display: flex; padding: 8px 0; border-bottom: 1px solid #f5f5f5; font-size: 0.88rem; }
+.modal-body .detail-label { width: 90px; flex-shrink: 0; color: #888; font-weight: 500; }
+.modal-body .detail-value { flex: 1; color: #333; word-break: break-all; }
+.modal-body .wechat-section { margin-top: 16px; text-align: center; }
+.modal-body .wechat-section img { max-width: 180px; border-radius: 8px; }
+.modal-footer { padding: 12px 20px; border-top: 1px solid #eee; display: flex; justify-content: flex-end; gap: 8px; }
+.toast-container { position: fixed; top: 16px; right: 16px; z-index: 2000; display: flex; flex-direction: column; gap: 6px; }
+.toast { padding: 10px 18px; border-radius: 8px; font-size: 0.85rem; color: #fff; box-shadow: 0 4px 16px rgba(0,0,0,0.15); animation: slideIn 0.3s ease; max-width: 360px; }
+.toast-success { background: #28a745; }
+.toast-error { background: #dc3545; }
+.toast-info { background: var(--primary); }
+@keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+.weather-float { position: fixed; top: 80px; right: 12px; background: #fff; border-radius: 10px; padding: 8px 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.1); font-size: 0.78rem; z-index: 200; display: flex; align-items: center; gap: 6px; }
+.weather-float .w-icon { font-size: 1.4rem; }
+.weather-bubble { position: fixed; top: 120px; right: 12px; background: #fff; border-radius: 8px; padding: 6px 12px; font-size: 0.75rem; box-shadow: 0 2px 8px rgba(0,0,0,0.08); z-index: 200; opacity: 0; transition: opacity 0.3s; pointer-events: none; }
+.weather-bubble.show { opacity: 1; }
+@media (max-width: 768px) {
+    body { padding: 8px; }
+    .navbar-custom { padding: 10px 12px; font-size: 0.9rem; }
+    .table { font-size: 0.75rem; }
+    .table th, .table td { padding: 6px 4px; }
+    .stats-card { flex-direction: column; align-items: flex-start; }
+    .toolbar-card { flex-direction: column; }
+    .weather-float { top: 60px; right: 4px; }
+}
+.empty-state { text-align: center; padding: 40px 20px; color: #ccc; }
+.empty-state .e-icon { font-size: 3rem; margin-bottom: 10px; }
+.empty-state p { font-size: 0.95rem; }
+.loading-spinner { display: inline-block; width: 20px; height: 20px; border: 2px solid var(--primary); border-top-color: transparent; border-radius: 50%; animation: spin 0.6s linear infinite; vertical-align: middle; margin-right: 6px; }
+@keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<!-- 同步状态 -->
+<div id="syncStatus" class="sync-status sync-loading">⏳ 正在加载数据...</div>
+
+<!-- Toast -->
+<div id="toastContainer" class="toast-container"></div>
+
+<!-- 天气 -->
+<div id="weatherFloat" class="weather-float" style="display:none;">
+  <span class="w-icon" id="weatherIcon">☀️</span>
+  <span id="weatherDesc" style="font-size:0.78rem;">--</span>
+  <span id="weatherTemp" style="margin-left:4px;font-weight:600;">--°C</span>
+</div>
+<div id="weatherBubble" class="weather-bubble"></div>
+
+<!-- 导航栏 -->
+<nav class="navbar-custom">
+  <div class="brand">🏠 尹檀家教 <small>Chengdu Tutor</small></div>
+  <div style="font-size:0.82rem; opacity:0.85;">📱 扫码联系尹檀老师</div>
+</nav>
+
+<!-- 统计 -->
+<div class="stats-card" id="statsCard">
+  <div class="stats-total">📋 当前 <span id="totalCount">--</span> 条订单</div>
+  <div class="stats-row" id="districtStats">加载中...</div>
+</div>
+
+<!-- 工具栏 -->
+<div class="toolbar-card">
+  <div class="search-wrap">
+    <span class="search-icon">🔍</span>
+    <input type="text" class="search-input" id="searchInput" placeholder="搜索区域、科目、年级、要求..." oninput="applyFilters()">
+  </div>
+  <div class="location-wrap">
+    <span style="color:var(--primary);">📍</span>
+    <span id="refAddress" class="loc-addr text-muted">未设置参考点</span>
+    <button class="btn btn-outline-success btn-sm" onclick="getGeoLocation()" id="btnGeo">📍 定位</button>
+    <button class="btn btn-outline-primary btn-sm" onclick="openMapPicker()">🗺️ 地图</button>
+    <button class="btn btn-outline-secondary btn-sm" onclick="clearRefPoint()" id="btnClearRef" style="display:none;">✕</button>
+  </div>
+</div>
+
+<!-- 筛选标签 -->
+<div class="filter-bar" id="filterBar"></div>
+
+<!-- 表格 -->
+<div class="main-card">
+  <div class="table-responsive">
+    <table class="table" id="orderTable">
+      <thead id="tableHead"></thead>
+      <tbody id="tableBody"></tbody>
+    </table>
+  </div>
+  <div class="page-info" id="pageInfo"></div>
+  <div class="pagination-wrap" id="paginationWrap"></div>
+</div>
+
+<!-- 详情弹窗 -->
+<div class="modal" id="orderModal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h5>📄 订单详情</h5>
+      <button class="modal-close" onclick="closeModal()">&times;</button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+    <div class="modal-footer">
+      <button class="btn btn-outline-secondary btn-sm" onclick="closeModal()">关闭</button>
+      <button class="btn btn-primary btn-sm" onclick="copyOrderInfo()">📋 一键复制信息</button>
+    </div>
+  </div>
+</div>
+
+<!-- 地图弹窗 -->
+<div class="modal" id="mapModal">
+  <div class="modal-content" style="max-width:700px;">
+    <div class="modal-header">
+      <h5>🗺️ 手动选择参考点</h5>
+      <button class="modal-close" onclick="closeMapModal()">&times;</button>
+    </div>
+    <div class="modal-body" style="padding:0;">
+      <div style="padding:10px;display:flex;gap:6px;">
+        <input type="text" class="search-input" id="mapSearchInput" placeholder="搜索地址..." style="border-radius:8px;">
+        <button class="btn btn-primary btn-sm" onclick="searchMapAddress()">搜索</button>
+      </div>
+      <div id="mapContainer" style="width:100%;height:380px;"></div>
+    </div>
+  </div>
+</div>
+
+<script src="js/cloudbase.full.js"></script>
+<script src="js/config.js"></script>
+<script src="js/orders_embedded.js"></script>
+<script src="js/utils.js"></script>
+<script src="js/data.js"></script>
+<script src="js/render.js"></script>
+<script src="js/detail.js"></script>
+<script src="js/analytics.js"></script>
+<script src="js/init.js"></script>
+</body>
+</html>
